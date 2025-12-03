@@ -1,0 +1,193 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Onmyoji Theme - Japanese Yokai/Spirit Aesthetic */
+:root {
+  /* Dark theme by default */
+  --background: oklch(0.12 0.02 280);
+  --foreground: oklch(0.93 0.01 280);
+  --card: oklch(0.15 0.02 280);
+  --card-foreground: oklch(0.93 0.01 280);
+  --popover: oklch(0.15 0.02 280);
+  --popover-foreground: oklch(0.93 0.01 280);
+  --primary: oklch(0.65 0.2 10);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.22 0.04 250);
+  --secondary-foreground: oklch(0.93 0.01 280);
+  --muted: oklch(0.2 0.02 280);
+  --muted-foreground: oklch(0.65 0.01 280);
+  --accent: oklch(0.75 0.15 50);
+  --accent-foreground: oklch(0.12 0.02 280);
+  --destructive: oklch(0.55 0.2 25);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.25 0.02 280);
+  --input: oklch(0.2 0.02 280);
+  --ring: oklch(0.65 0.2 10);
+  --radius: 0.75rem;
+
+  /* Custom Onmyoji colors */
+  --sakura: oklch(0.65 0.2 10);
+  --yokai-blue: oklch(0.22 0.08 250);
+  --spirit-gold: oklch(0.75 0.15 80);
+  --shadow-purple: oklch(0.3 0.1 300);
+}
+
+.dark {
+  --background: oklch(0.12 0.02 280);
+  --foreground: oklch(0.93 0.01 280);
+  --card: oklch(0.15 0.02 280);
+  --card-foreground: oklch(0.93 0.01 280);
+  --popover: oklch(0.15 0.02 280);
+  --popover-foreground: oklch(0.93 0.01 280);
+  --primary: oklch(0.65 0.2 10);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.22 0.04 250);
+  --secondary-foreground: oklch(0.93 0.01 280);
+  --muted: oklch(0.2 0.02 280);
+  --muted-foreground: oklch(0.65 0.01 280);
+  --accent: oklch(0.75 0.15 50);
+  --accent-foreground: oklch(0.12 0.02 280);
+  --destructive: oklch(0.55 0.2 25);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.25 0.02 280);
+  --input: oklch(0.2 0.02 280);
+  --ring: oklch(0.65 0.2 10);
+}
+
+@theme inline {
+  --font-sans: "Noto Sans JP", "Inter", system-ui, sans-serif;
+  --font-serif: "Noto Serif JP", serif;
+  --font-mono: "Geist Mono", "Geist Mono Fallback", monospace;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sakura: var(--sakura);
+  --color-yokai-blue: var(--yokai-blue);
+  --color-spirit-gold: var(--spirit-gold);
+  --color-shadow-purple: var(--shadow-purple);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Sakura petals animation */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(180deg);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(233, 69, 96, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(233, 69, 96, 0.6);
+  }
+}
+
+@keyframes heartbeat {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  animation: shimmer 2s linear infinite;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  background-size: 200% 100%;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-heartbeat {
+  animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+/* Glassmorphism utilities */
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-hover:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(233, 69, 96, 0.3);
+}
+
+/* Japanese pattern overlay */
+.pattern-overlay {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23e94560' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: oklch(0.15 0.02 280);
+}
+
+::-webkit-scrollbar-thumb {
+  background: oklch(0.3 0.02 280);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.65 0.2 10);
+}
