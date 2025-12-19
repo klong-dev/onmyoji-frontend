@@ -46,6 +46,38 @@ async function fetchApi<T>(endpoint: string, options: FetchOptions = {}): Promis
   }
 }
 
+// Auth API
+export const authApi = {
+  updateProfile: (data: { displayName?: string }, token: string) =>
+    fetchApi<{ user: User }>("/auth/profile", {
+      method: "PUT",
+      body: JSON.stringify(data),
+      token,
+    }),
+  changePassword: (data: { currentPassword: string; newPassword: string }, token: string) =>
+    fetchApi<{ message: string }>("/auth/change-password", {
+      method: "PUT",
+      body: JSON.stringify(data),
+      token,
+    }),
+  // Admin
+  adminGetUsers: (token: string, params?: { page?: number; search?: string; status?: string }) => {
+    const searchParams = new URLSearchParams();
+    if (params?.page) searchParams.set("page", params.page.toString());
+    if (params?.search) searchParams.set("search", params.search);
+    if (params?.status) searchParams.set("status", params.status);
+    return fetchApi<{ users: User[]; pagination: Pagination }>(`/auth/admin/users?${searchParams}`, { token });
+  },
+  adminUpdateUser: (id: string, data: { role?: string; isActive?: boolean; displayName?: string }, token: string) =>
+    fetchApi<{ user: User }>(`/auth/admin/users/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+      token,
+    }),
+  adminGetStats: (token: string) =>
+    fetchApi<{ total: number; active: number; banned: number; admins: number }>("/auth/admin/stats", { token }),
+};
+
 // Chat API
 export const chatApi = {
   getMessages: () => fetchApi<{ messages: Message[] }>("/chat/messages"),
@@ -55,7 +87,34 @@ export const chatApi = {
       body: JSON.stringify({ message: messageContent }),
       token,
     }),
-  getOnlineCount: () => fetchApi<{ count: number }>("/chat/online"),
+  getOnlineCount: () => fetchApi<{ total: number; web: number; client: number }>("/chat/online"),
+  heartbeat: (clientType: "web" | "client", token: string) =>
+    fetchApi<{ message: string }>("/chat/heartbeat", {
+      method: "POST",
+      body: JSON.stringify({ clientType }),
+      token,
+    }),
+  // Admin
+  adminGetMessages: (token: string, params?: { page?: number; search?: string; status?: string }) => {
+    const searchParams = new URLSearchParams();
+    if (params?.page) searchParams.set("page", params.page.toString());
+    if (params?.search) searchParams.set("search", params.search);
+    if (params?.status) searchParams.set("status", params.status);
+    return fetchApi<{ messages: AdminMessage[]; pagination: Pagination }>(`/chat/admin/messages?${searchParams}`, { token });
+  },
+  adminGetStats: (token: string) =>
+    fetchApi<{ total: number; flagged: number; deleted: number; today: number }>("/chat/admin/stats", { token }),
+  adminUpdateMessage: (id: string, status: string, token: string) =>
+    fetchApi<{ message: AdminMessage }>(`/chat/admin/messages/${id}`, {
+      method: "PUT",
+      body: JSON.stringify({ status }),
+      token,
+    }),
+  adminDeleteMessage: (id: string, token: string) =>
+    fetchApi(`/chat/admin/messages/${id}`, {
+      method: "DELETE",
+      token,
+    }),
 };
 
 // Forum API
@@ -157,12 +216,77 @@ export const githubApi = {
   getReleases: () => fetchApi<{ releases: Release[] }>("/github/releases"),
 };
 
+// Releases API (local releases)
+export const releasesApi = {
+  getAll: (params?: { page?: number; limit?: number }) => {
+    const searchParams = new URLSearchParams();
+    if (params?.page) searchParams.set("page", params.page.toString());
+    if (params?.limit) searchParams.set("limit", params.limit.toString());
+    return fetchApi<{ releases: ReleaseNote[]; pagination: Pagination }>(`/releases?${searchParams}`);
+  },
+  getLatest: () => fetchApi<{ release: ReleaseNote }>("/releases/latest"),
+  getById: (id: string) => fetchApi<{ release: ReleaseNote }>(`/releases/${id}`),
+  getDownloadUrl: (id: string) => `${API_URL}/releases/download/${id}`,
+  // Admin
+  adminList: (token: string, params?: { page?: number; limit?: number }) => {
+    const searchParams = new URLSearchParams();
+    if (params?.page) searchParams.set("page", params.page.toString());
+    if (params?.limit) searchParams.set("limit", params.limit.toString());
+    return fetchApi<{ releases: ReleaseNote[]; pagination: Pagination }>(`/releases/admin/list?${searchParams}`, { token });
+  },
+  adminCreate: (data: FormData, token: string) =>
+    fetch(`${API_URL}/releases/admin/create`, {
+      method: "POST",
+      body: data,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }).then(async (res) => {
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.message || "Failed to create release");
+      return json.data as { release: ReleaseNote };
+    }),
+  adminUpdate: (id: string, data: Partial<CreateReleaseData>, token: string) =>
+    fetchApi<{ release: ReleaseNote }>(`/releases/admin/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+      token,
+    }),
+  adminUploadFile: (id: string, file: File, token: string) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return fetch(`${API_URL}/releases/admin/${id}/upload`, {
+      method: "POST",
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }).then(async (res) => {
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.message || "Failed to upload file");
+      return json.data as { release: ReleaseNote };
+    });
+  },
+  adminDeleteFile: (id: string, token: string) =>
+    fetchApi<{ release: ReleaseNote }>(`/releases/admin/${id}/file`, {
+      method: "DELETE",
+      token,
+    }),
+  adminDelete: (id: string, token: string) =>
+    fetchApi(`/releases/admin/${id}`, {
+      method: "DELETE",
+      token,
+    }),
+  adminStats: (token: string) =>
+    fetchApi<{ total: number; published: number; draft: number; totalDownloads: number }>("/releases/admin/stats", { token }),
+};
+
 // Donation API
 export const donationApi = {
-  getActive: () => fetchApi<{ donation: Donation | null }>("/donation/active"),
-  getRecentDonors: () => fetchApi<{ donors: Donor[] }>("/donation/recent-donors"),
+  getActive: () => fetchApi<Donation | null>("/donation/active"),
+  getRecentDonors: () => fetchApi<DonorTransaction[]>("/donation/recent-donors"),
   createPayment: (data: CreatePaymentData) =>
-    fetchApi<{ checkoutUrl: string; orderCode: string }>("/donation/create-payment", {
+    fetchApi<{ checkoutUrl: string; orderCode: number; transactionId: string }>("/donation/create-payment", {
       method: "POST",
       body: JSON.stringify(data),
     }),
@@ -238,6 +362,17 @@ export interface Message {
   createdAt: string;
 }
 
+export interface AdminMessage extends Message {
+  status: "normal" | "flagged" | "deleted";
+  type: "message" | "system" | "announcement";
+  user?: {
+    id: string;
+    username: string;
+    displayName: string;
+    role: string;
+  };
+}
+
 export interface ForumPost {
   id: string;
   title: string;
@@ -295,6 +430,34 @@ export interface Release {
   type: "major" | "minor" | "patch" | "hotfix";
 }
 
+export interface ReleaseNote {
+  id: string;
+  version: string;
+  title: string;
+  content: string;
+  type: "major" | "minor" | "patch" | "hotfix" | "oasx" | "oas";
+  isPublished: boolean;
+  publishedAt: string;
+  downloadUrl?: string | null;
+  changelogUrl?: string | null;
+  fileName?: string | null;
+  fileSize?: number | null;
+  filePath?: string | null;
+  downloadCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateReleaseData {
+  version: string;
+  title: string;
+  content: string;
+  type?: "major" | "minor" | "patch" | "hotfix" | "oasx" | "oas";
+  downloadUrl?: string;
+  changelogUrl?: string;
+  isPublished?: boolean;
+}
+
 export interface Donation {
   id: string;
   title: string;
@@ -302,9 +465,10 @@ export interface Donation {
   goalAmount: number;
   currentAmount: number;
   isActive: boolean;
-  endDate?: string;
-  donorsCount: number;
+  endDate?: string | null;
+  donorCount?: number;
   createdAt: string;
+  transactions?: DonorTransaction[];
 }
 
 export interface Donor {
@@ -312,6 +476,14 @@ export interface Donor {
   amount: number;
   message?: string;
   createdAt: string;
+}
+
+// Backend response for recent donors
+export interface DonorTransaction {
+  donorName: string;
+  amount: number;
+  donorMessage?: string | null;
+  paidAt: string;
 }
 
 export interface Transaction {
@@ -338,10 +510,9 @@ export interface CreateArticleData {
 }
 
 export interface CreatePaymentData {
-  donationId: string;
   amount: number;
   donorName?: string;
-  message?: string;
+  donorMessage?: string;
 }
 
 export interface CreateDonationData {
@@ -402,11 +573,11 @@ export interface ShikigamiData {
   nameVi: string;
   slug: string;
   rarity: "SP" | "SSR" | "SR" | "R" | "N";
-  role: "DPS" | "Support" | "Control" | "Tank" | "Healer";
+  role: "DPS" | "Support" | "Control" | "Tank" | "Healer" | "Utility";
   image: string;
   thumbnail?: string;
   description?: string;
-  descriptionVi?: string;
+  lore?: string;
   baseHp?: number;
   baseAtk?: number;
   baseDef?: number;
@@ -416,6 +587,7 @@ export interface ShikigamiData {
   isFeatured: boolean;
   views: number;
   skills?: ShikigamiSkillData[];
+  souls?: SoulData[];
   recommendedSouls?: SoulData[];
   createdAt: string;
   updatedAt: string;
@@ -425,12 +597,13 @@ export interface ShikigamiSkillData {
   id: string;
   shikigamiId: string;
   name: string;
+  nameVi?: string;
   type: "normal" | "passive" | "active";
   description: string;
   descriptionVi?: string;
   cooldown?: number;
   orbs?: number;
-  damage?: number;
+  damage?: string;
   effects?: Record<string, unknown>;
   icon?: string;
   order: number;
@@ -444,14 +617,29 @@ export interface SoulData {
   slug: string;
   type: "attack" | "crit" | "hp" | "def" | "effect_hit" | "effect_res" | "special";
   image?: string;
+  description?: string;
   effect2pc: string;
   effect4pc: string;
   effect2pcVi?: string;
   effect4pcVi?: string;
   recommendedFor?: string[];
+  recommendedShikigami?: ShikigamiData[];
   isFeatured: boolean;
+  views?: number;
   createdAt: string;
   updatedAt: string;
+}
+
+// User Types
+export interface User {
+  id: string;
+  username: string;
+  email: string;
+  displayName?: string;
+  role: "user" | "admin";
+  isActive: boolean;
+  createdAt: string;
+  lastLogin?: string;
 }
 
 // Category Types

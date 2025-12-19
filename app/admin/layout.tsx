@@ -3,7 +3,7 @@ import type { Metadata } from "next"
 import { redirect } from "next/navigation"
 import { cookies } from "next/headers"
 import Link from "next/link"
-import { LayoutDashboard, Users, Gift, MessageSquare, Settings, LogOut, Crown, Scroll } from "lucide-react"
+import { LayoutDashboard, Users, Gift, MessageSquare, Settings, LogOut, Crown, Scroll, Package } from "lucide-react"
 
 export const metadata: Metadata = {
   title: "Admin Dashboard - Onmyoji Fan Hub",
@@ -15,6 +15,7 @@ const adminNavItems = [
   { href: "/admin", icon: LayoutDashboard, label: "Tổng quan" },
   { href: "/admin/users", icon: Users, label: "Người dùng" },
   { href: "/admin/giftcodes", icon: Gift, label: "Giftcode" },
+  { href: "/admin/releases", icon: Package, label: "Releases" },
   { href: "/admin/donations", icon: Crown, label: "Quyên góp" },
   { href: "/admin/messages", icon: MessageSquare, label: "Tin nhắn" },
   { href: "/admin/settings", icon: Settings, label: "Cài đặt" },

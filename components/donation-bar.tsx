@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -13,41 +13,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { donationApi, type Donation, type Donor } from "@/lib/api"
 
 const quickAmounts = [20000, 50000, 100000, 200000, 500000]
 
-const MOCK_DONATION = {
-  id: "1",
-  title: "Duy trì Server tháng 12",
-  description: "Ủng hộ chi phí server và phát triển tính năng mới",
-  goalAmount: 5000000,
-  currentAmount: 3250000,
-}
-
-const MOCK_DONORS = [
-  { name: "OnmyojiLover", amount: 500000 },
-  { name: "SSRHunter", amount: 200000 },
-  { name: "Ẩn danh", amount: 100000 },
-  { name: "TamaSama", amount: 150000 },
-  { name: "YokaiMaster", amount: 300000 },
-]
-
-interface Donation {
-  id: string
-  title: string
-  description: string
-  goalAmount: number
-  currentAmount: number
-}
-
-interface Donor {
-  name: string
-  amount: number
-}
-
 export function DonationBar() {
-  const [donation, setDonation] = useState<Donation | null>(MOCK_DONATION)
-  const [donors, setDonors] = useState<Donor[]>(MOCK_DONORS)
+  const [donation, setDonation] = useState<Donation | null>(null)
+  const [donors, setDonors] = useState<Donor[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   const [open, setOpen] = useState(false)
   const [amount, setAmount] = useState(50000)
@@ -55,7 +29,59 @@ export function DonationBar() {
   const [message, setMessage] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  if (!donation) return null
+  const fetchDonation = useCallback(async () => {
+    try {
+      setError(null)
+      const data = await donationApi.getActive()
+      // API trả về data trực tiếp (đã unwrap từ { success, data })
+      setDonation(data as unknown as Donation)
+    } catch (err) {
+      console.error("Failed to fetch donation:", err)
+      setError("Không thể tải thông tin donation")
+    }
+  }, [])
+
+  const fetchDonors = useCallback(async () => {
+    try {
+      const data = await donationApi.getRecentDonors()
+      // API trả về mảng DonorTransaction từ backend
+      const donorsArray = Array.isArray(data) ? data : []
+      // Map backend field names to frontend Donor interface
+      const mappedDonors: Donor[] = donorsArray.map((d) => ({
+        name: d.donorName || "Ẩn danh",
+        amount: d.amount,
+        message: d.donorMessage || undefined,
+        createdAt: d.paidAt,
+      }))
+      setDonors(mappedDonors)
+    } catch (err) {
+      console.error("Failed to fetch donors:", err)
+    }
+  }, [])
+
+  useEffect(() => {
+    const loadData = async () => {
+      setIsLoading(true)
+      await Promise.all([fetchDonation(), fetchDonors()])
+      setIsLoading(false)
+    }
+    loadData()
+  }, [fetchDonation, fetchDonors])
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="max-w-2xl mx-auto p-6 rounded-2xl glass">
+        <div className="flex items-center justify-center py-4">
+          <span className="animate-spin mr-2">⏳</span>
+          <span className="text-muted-foreground">Đang tải...</span>
+        </div>
+      </div>
+    )
+  }
+
+  // No active donation or error
+  if (!donation || error) return null
 
   const percentage = Math.min((donation.currentAmount / donation.goalAmount) * 100, 100)
 
@@ -67,13 +93,24 @@ export function DonationBar() {
     if (amount < 10000) return
 
     setIsSubmitting(true)
-    setTimeout(() => {
-      alert(
-        `Cảm ơn bạn đã muốn ủng hộ ${formatCurrency(amount)}! Tính năng thanh toán sẽ hoạt động khi kết nối backend.`,
-      )
+    try {
+      const response = await donationApi.createPayment({
+        amount,
+        donorName: donorName.trim() || undefined,
+        donorMessage: message.trim() || undefined,
+      })
+
+      // Redirect to PayOS checkout
+      if (response.checkoutUrl) {
+        window.location.href = response.checkoutUrl
+      } else {
+        throw new Error("Không nhận được link thanh toán")
+      }
+    } catch (err) {
+      console.error("Payment error:", err)
+      alert(err instanceof Error ? err.message : "Không thể tạo thanh toán. Vui lòng thử lại.")
       setIsSubmitting(false)
-      setOpen(false)
-    }, 1000)
+    }
   }
 
   return (

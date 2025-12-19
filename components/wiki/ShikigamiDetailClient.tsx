@@ -265,9 +265,9 @@ export default function ShikigamiDetailClient({ slug }: Props) {
                   {shikigami.skills.map((skill: any, index: number) => (
                     <div key={skill.id || index} className="p-4 rounded-lg bg-muted/50 border border-border">
                       <div className="flex items-start gap-3">
-                        <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center flex-shrink-0">{skill.image ? <Image src={skill.image} alt={skill.nameVi || skill.name} width={48} height={48} className="rounded-lg" /> : <Zap className="h-6 w-6 text-purple-500" />}</div>
+                        <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center flex-shrink-0">{skill.icon ? <Image src={skill.icon} alt={skill.nameVi || skill.name} width={48} height={48} className="rounded-lg" /> : <Zap className="h-6 w-6 text-purple-500" />}</div>
                         <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
                             <h4 className="font-semibold">{skill.nameVi || skill.name}</h4>
                             {skill.type && (
                               <Badge variant="outline" className="text-xs">
@@ -277,8 +277,23 @@ export default function ShikigamiDetailClient({ slug }: Props) {
                                 {!["passive", "active", "normal"].includes(skill.type) && skill.type}
                               </Badge>
                             )}
+                            {skill.orbs !== undefined && skill.orbs !== null && (
+                              <Badge variant="secondary" className="text-xs bg-blue-500/20 text-blue-400">
+                                🔥 {skill.orbs} Quỷ hỏa
+                              </Badge>
+                            )}
+                            {skill.cooldown && (
+                              <Badge variant="secondary" className="text-xs bg-orange-500/20 text-orange-400">
+                                ⏱️ CD: {skill.cooldown} lượt
+                              </Badge>
+                            )}
                           </div>
                           <p className="text-sm text-muted-foreground">{skill.descriptionVi || skill.description}</p>
+                          {skill.damage && (
+                            <div className="mt-2 text-xs">
+                              <span className="text-red-400 font-medium">💥 Sát thương: {skill.damage}</span>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>

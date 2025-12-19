@@ -34,7 +34,7 @@ export function ChatRoom() {
   const fetchOnlineCount = useCallback(async () => {
     try {
       const data = await chatApi.getOnlineCount();
-      setOnlineCount(data?.count || 0);
+      setOnlineCount(data?.total || 0);
     } catch (err) {
       console.error("Failed to fetch online count:", err);
     }

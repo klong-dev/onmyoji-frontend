@@ -1,12 +1,29 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { DonationBar } from "@/components/donation-bar"
+import { chatApi } from "@/lib/api"
 
 export function HeroSection() {
-  const [onlineCount] = useState(128)
+  const [onlineCount, setOnlineCount] = useState(0)
+
+  useEffect(() => {
+    const fetchOnlineCount = async () => {
+      try {
+        const data = await chatApi.getOnlineCount()
+        setOnlineCount(data?.total || data?.count || 0)
+      } catch (err) {
+        console.error("Failed to fetch online count:", err)
+      }
+    }
+
+    fetchOnlineCount()
+    // Refresh every 30 seconds
+    const interval = setInterval(fetchOnlineCount, 30000)
+    return () => clearInterval(interval)
+  }, [])
 
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
