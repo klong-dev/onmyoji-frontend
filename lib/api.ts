@@ -317,6 +317,10 @@ export const donationApi = {
       body: JSON.stringify(data),
       token,
     }),
+  getLeaderboard: (period: 'all' | 'month' | 'week' = 'all', limit = 10) =>
+    fetchApi<{ period: string; leaderboard: LeaderboardEntry[] }>(`/donation/leaderboard?period=${period}&limit=${limit}`),
+  getMilestones: () =>
+    fetchApi<{ currentAmount: number; goalAmount: number; milestones: Milestone[] }>("/donation/milestones"),
 };
 
 // Giftcode API
@@ -528,6 +532,22 @@ export interface ManualDonationData {
   donorName: string;
   message?: string;
 }
+
+export interface LeaderboardEntry {
+  rank: number;
+  donorName: string;
+  totalAmount: number;
+  donationCount: number;
+  badge: string | null;
+}
+
+export interface Milestone {
+  amount: number;
+  description: string;
+  reached: boolean;
+  progress: number;
+}
+
 
 // Giftcode Types
 export interface Giftcode {
