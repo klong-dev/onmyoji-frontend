@@ -21,6 +21,8 @@ const adminNavItems = [
   { href: "/admin/settings", icon: Settings, label: "Cài đặt" },
 ]
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3020/api"
+
 export default async function AdminLayout({
   children,
 }: {
@@ -31,6 +33,27 @@ export default async function AdminLayout({
   const token = cookieStore.get("token")
 
   if (!token) {
+    redirect("/login?redirect=/admin")
+  }
+
+  // Verify token and check admin role
+  try {
+    const res = await fetch(`${API_URL}/auth/me`, {
+      headers: { Authorization: `Bearer ${token.value}` },
+      cache: 'no-store'
+    })
+    
+    if (!res.ok) {
+      redirect("/login?redirect=/admin")
+    }
+    
+    const data = await res.json()
+    const user = data.data?.user || data.user
+    
+    if (!user || user.role !== 'admin') {
+      redirect("/?error=unauthorized")
+    }
+  } catch (error) {
     redirect("/login?redirect=/admin")
   }
 

@@ -85,6 +85,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const user = response.data?.user || response.user;
 
     localStorage.setItem("token", token);
+    // Also set cookie for server-side auth (admin pages)
+    document.cookie = `token=${token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
     setToken(token);
     setUser(user);
   };
@@ -107,12 +109,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const user = response.data?.user || response.user;
 
     localStorage.setItem("token", token);
+    // Also set cookie for server-side auth (admin pages)
+    document.cookie = `token=${token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
     setToken(token);
     setUser(user);
   };
 
   const logout = () => {
     localStorage.removeItem("token");
+    // Also remove cookie
+    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
     setToken(null);
     setUser(null);
   };
