@@ -8,11 +8,20 @@ import { FeaturedShikigamiClient } from "@/components/featured-shikigami-client"
 import FeaturedSoulsClient from "@/components/wiki/FeaturedSoulsClient";
 
 export const metadata: Metadata = {
-  title: "Wiki - Onmyoji AutoVN",
-  description: "Thư viện kiến thức đầy đủ về Onmyoji. Tìm hiểu về thức thần, ngự hồn, đội hình và chiến thuật.",
+  title: "Wiki Onmyoji Tiếng Việt - Thức Thần, Ngự Hồn, Build Guide",
+  description: "Thư viện wiki Onmyoji tiếng Việt đầy đủ nhất. Thông tin 200+ thức thần, 100+ ngự hồn, cách build và tier list 2024. Cập nhật liên tục.",
+  keywords: [
+    "wiki Onmyoji tiếng Việt", "thức thần Onmyoji", "ngự hồn Onmyoji",
+    "shikigami Onmyoji", "build thức thần", "tier list Onmyoji",
+    "Âm Dương Sư wiki", "hướng dẫn Onmyoji"
+  ],
   openGraph: {
-    title: "Wiki Onmyoji AutoVN",
-    description: "Thư viện kiến thức đầy đủ về Onmyoji",
+    title: "Wiki Onmyoji Tiếng Việt - Thức Thần, Ngự Hồn, Build",
+    description: "Thư viện kiến thức Onmyoji đầy đủ nhất bằng tiếng Việt",
+    images: ["/og-wiki.png"],
+  },
+  alternates: {
+    canonical: "/wiki",
   },
 };
 

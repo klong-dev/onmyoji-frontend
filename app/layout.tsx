@@ -20,31 +20,59 @@ const notoSerifJP = Noto_Serif_JP({
 
 export const metadata: Metadata = {
   title: {
-    default: "OnmyojiAutoVN - Cộng đồng Auto Script Onmyoji",
+    default: "OnmyojiAutoVN - Tool Auto Onmyoji Miễn Phí #1 Việt Nam",
     template: "%s | OnmyojiAutoVN",
   },
-  description: "Nền tảng cộng đồng dành cho người chơi Onmyoji sử dụng auto script. Tải tool, hướng dẫn, diễn đàn thảo luận và wiki.",
-  keywords: ["Onmyoji", "auto script", "game tool", "Âm Dương Sư", "shikigami", "yokai"],
+  description: "Tải tool auto Onmyoji miễn phí. Farm tự động Orochi, Soul. Wiki thức thần, ngự hồn tiếng Việt đầy đủ. Cộng đồng 10,000+ người chơi Âm Dương Sư.",
+  keywords: [
+    "Onmyoji auto", "tool Onmyoji", "Âm Dương Sư auto", "auto farm Onmyoji",
+    "script Onmyoji", "Onmyoji Việt Nam", "tool tự động Onmyoji", 
+    "auto clicker Onmyoji", "farm Orochi auto", "thức thần Onmyoji",
+    "ngự hồn Onmyoji", "wiki Onmyoji tiếng Việt", "shikigami Onmyoji",
+    "download Onmyoji auto", "tải tool Onmyoji"
+  ],
   authors: [{ name: "OnmyojiAutoVN Team" }],
   creator: "OnmyojiAutoVN",
+  metadataBase: new URL("https://onmyojivn.site"),
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     type: "website",
     locale: "vi_VN",
-    url: "https://onmyojiautovn.com",
+    url: "https://onmyojivn.site",
     siteName: "OnmyojiAutoVN",
-    title: "OnmyojiAutoVN - Cộng đồng Auto Script Onmyoji",
-    description: "Nền tảng cộng đồng dành cho người chơi Onmyoji sử dụng auto script.",
+    title: "OnmyojiAutoVN - Tool Auto Onmyoji Miễn Phí #1 Việt Nam",
+    description: "Tải tool auto Onmyoji miễn phí. Wiki thức thần, ngự hồn tiếng Việt đầy đủ nhất.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "OnmyojiAutoVN - Tool Auto Onmyoji",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "OnmyojiAutoVN",
-    description: "Cộng đồng Auto Script Onmyoji",
+    title: "OnmyojiAutoVN - Tool Auto Onmyoji Miễn Phí",
+    description: "Cộng đồng Auto Script Onmyoji lớn nhất Việt Nam",
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
-  generator: "v0.app",
+  verification: {
+    google: "your-google-verification-code", // TODO: Add actual code
+  },
 };
 
 export const viewport: Viewport = {

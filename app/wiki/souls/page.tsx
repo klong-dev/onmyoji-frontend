@@ -6,11 +6,19 @@ import { ArrowLeft, Sparkles } from "lucide-react";
 import SoulsListClient from "@/components/wiki/SoulsListClient";
 
 export const metadata: Metadata = {
-  title: "Ngự Hồn - Wiki Onmyoji AutoVN",
-  description: "Danh sách đầy đủ các Ngự Hồn trong Onmyoji. Tìm hiểu hiệu ứng, cách sử dụng và thức thần phù hợp.",
+  title: "Ngự Hồn Onmyoji - Hiệu Ứng 2 4 Mảnh & Build Guide",
+  description: "100+ ngự hồn Onmyoji với hiệu ứng 2 mảnh, 4 mảnh. Seductress, Fortune Cat, Shadow, Watcher và nhiều set khác. Thức thần phù hợp từng loại.",
+  keywords: [
+    "ngự hồn Onmyoji", "soul Onmyoji", "hiệu ứng ngự hồn", "build ngự hồn",
+    "Seductress Onmyoji", "Fortune Cat", "ngự hồn tốt nhất", "ngự hồn meta"
+  ],
   openGraph: {
-    title: "Ngự Hồn - Wiki Onmyoji AutoVN",
-    description: "Danh sách đầy đủ các Ngự Hồn trong Onmyoji",
+    title: "Ngự Hồn Onmyoji - Hiệu Ứng & Build Guide",
+    description: "100+ ngự hồn với hiệu ứng và thức thần phù hợp",
+    images: ["/og-souls.png"],
+  },
+  alternates: {
+    canonical: "/wiki/souls",
   },
 };
 

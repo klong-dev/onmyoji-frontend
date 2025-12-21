@@ -4,11 +4,19 @@ import { ArrowLeft, Sparkles } from "lucide-react";
 import ShikigamiListClient from "@/components/wiki/ShikigamiListClient";
 
 export const metadata: Metadata = {
-  title: "Thức Thần - Wiki Onmyoji AutoVN",
-  description: "Danh sách đầy đủ các Thức Thần trong Onmyoji. Tìm hiểu chỉ số, kỹ năng và cách build.",
+  title: "Danh Sách Thức Thần Onmyoji - Tier List & Build Guide 2024",
+  description: "200+ thức thần Onmyoji với chỉ số, kỹ năng, ngự hồn phù hợp. SSR, SP, SR tier list mới nhất. Hướng dẫn build và đội hình meta.",
+  keywords: [
+    "danh sách thức thần Onmyoji", "tier list thức thần", "shikigami Onmyoji",
+    "SSR Onmyoji", "SP Onmyoji", "build thức thần", "thức thần mạnh nhất"
+  ],
   openGraph: {
-    title: "Thức Thần - Wiki Onmyoji AutoVN",
-    description: "Danh sách đầy đủ các Thức Thần trong Onmyoji",
+    title: "Danh Sách Thức Thần Onmyoji - Tier List 2024",
+    description: "200+ thức thần với chỉ số, kỹ năng và ngự hồn phù hợp",
+    images: ["/og-shikigami.png"],
+  },
+  alternates: {
+    canonical: "/wiki/shikigami",
   },
 };
 
