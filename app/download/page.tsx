@@ -1,32 +1,57 @@
-import type { Metadata } from "next";
+"use client";
+
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { releasesApi, type ReleaseNote } from "@/lib/api";
 
-export const metadata: Metadata = {
-  title: "Tải xuống - Onmyoji AutoVN",
-  description: "Tải xuống phần mềm Onmyoji AutoVN - Hỗ trợ tự động hóa game Onmyoji",
-};
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3020/api";
 
 export default function DownloadPage() {
+  const [latestRelease, setLatestRelease] = useState<ReleaseNote | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchLatest = async () => {
+      try {
+        const data = await releasesApi.getLatest();
+        setLatestRelease(data.release);
+      } catch (error) {
+        console.error("Failed to fetch latest release:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchLatest();
+  }, []);
+
+  const handleDownload = () => {
+    // Trigger download from backend API
+    window.location.href = `${API_URL}/releases/download/latest`;
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Hero Section */}
       <div className="text-center mb-12">
         <Badge className="mb-4" variant="secondary">
-          Phiên bản mới nhất
+          {isLoading ? "Đang tải..." : latestRelease ? `Phiên bản ${latestRelease.version}` : "Phiên bản mới nhất"}
         </Badge>
         <h1 className="font-serif text-4xl font-bold text-foreground md:text-5xl mb-4">Tải xuống Onmyoji AutoVN</h1>
         <p className="text-muted-foreground max-w-2xl mx-auto mb-8">Phần mềm hỗ trợ tự động hóa game Onmyoji - Tiết kiệm thời gian, tối ưu hiệu quả</p>
 
         {/* Download Buttons */}
         <div className="flex flex-wrap justify-center gap-4 mb-8">
-          <Button size="lg" className="gap-2 text-lg px-8" asChild>
-            <a href="https://github.com/klong-dev/OnmyojiAutoVN/releases/latest" target="_blank" rel="noopener noreferrer">
-              <span>⬇️</span>
-              Tải xuống (Windows)
-            </a>
+          <Button 
+            size="lg" 
+            className="gap-2 text-lg px-8" 
+            onClick={handleDownload}
+            disabled={isLoading || !latestRelease}
+          >
+            <span>⬇️</span>
+            {isLoading ? "Đang tải..." : "Tải xuống (Windows)"}
           </Button>
           <Button size="lg" variant="outline" className="gap-2" asChild>
             <a href="https://github.com/klong-dev/OnmyojiAutoVN" target="_blank" rel="noopener noreferrer">
@@ -35,6 +60,16 @@ export default function DownloadPage() {
             </a>
           </Button>
         </div>
+
+        {/* Version Info */}
+        {latestRelease && (
+          <div className="mb-4 text-sm text-muted-foreground">
+            <p>📅 Cập nhật: {new Date(latestRelease.publishedAt || latestRelease.createdAt).toLocaleDateString('vi-VN')}</p>
+            {latestRelease.downloadCount !== undefined && (
+              <p>📊 Lượt tải: {latestRelease.downloadCount.toLocaleString()}</p>
+            )}
+          </div>
+        )}
 
         {/* Requirements */}
         <div className="inline-flex flex-wrap justify-center gap-2 text-sm text-muted-foreground">
@@ -66,12 +101,10 @@ export default function DownloadPage() {
                 <div>
                   <h3 className="font-semibold mb-2">Tải xuống bản release mới nhất</h3>
                   <p className="text-muted-foreground text-sm mb-2">
-                    Truy cập GitHub Releases và tải file <code className="bg-muted px-1.5 py-0.5 rounded">OnmyojiAutoVN-vX.X.X.zip</code>
+                    Click nút bên dưới để tải file <code className="bg-muted px-1.5 py-0.5 rounded">{latestRelease ? `OnmyojiAutoVN-${latestRelease.version}.zip` : 'OnmyojiAutoVN.zip'}</code>
                   </p>
-                  <Button variant="outline" size="sm" asChild>
-                    <a href="https://github.com/klong-dev/OnmyojiAutoVN/releases/latest" target="_blank" rel="noopener noreferrer">
-                      Đi đến trang tải xuống →
-                    </a>
+                  <Button variant="outline" size="sm" onClick={handleDownload} disabled={!latestRelease}>
+                    Tải xuống ngay →
                   </Button>
                 </div>
               </div>
